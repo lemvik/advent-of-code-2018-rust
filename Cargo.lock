@@ -9,3 +9,10 @@ dependencies = [
  "common 0.1.0",
 ]
 
+[[package]]
+name = "day2"
+version = "0.1.0"
+dependencies = [
+ "common 0.1.0",
+]
+

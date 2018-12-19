@@ -52,3 +52,13 @@ where
         })
         .collect()
 }
+
+pub fn read_lines<R>(reader: R) -> Result<Vec<String>>
+where
+    R: std::io::BufRead,
+{
+    reader
+        .lines()
+        .map(|s| s.map_err(InputError::from))
+        .collect()
+}
