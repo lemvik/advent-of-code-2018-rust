@@ -13,8 +13,13 @@ fn main() {
     }
 
     let input_file = File::open(&ar[1]).expect("Unable to open input file.");
-    let frequency =
-        day1::compute_frequency(BufReader::new(input_file)).expect("Failed to compute frequency.");
+    let numbers =
+        common::read_numbers(BufReader::new(input_file)).expect("Failed to read numbers.");
+    let frequency = day1::compute_frequency(&numbers);
+    let repetitive = day1::compute_repetitive_frequency(&numbers);
 
-    println!("Computed frequency: {}", frequency);
+    println!(
+        "Computed frequency: {}, repetitive: {}",
+        frequency, repetitive
+    );
 }
