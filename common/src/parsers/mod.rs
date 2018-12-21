@@ -1,23 +1,21 @@
-use crate::errors::ParseError;
 use std::str::FromStr;
 
-type Result<T> = std::result::Result<T, ParseError>;
+pub fn split_pair(text: &str, separator: char) -> Option<(&str, &str)> {
+    match text.find(separator) {
+        None => None,
+        Some(index) => Some((&text[..index], &text[index + 1..])),
+    }
+}
 
-pub fn parse_pair<N>(text: &str, separator: char) -> Result<(N, N)>
+pub fn parse_pair<N>(text: &str, separator: char) -> Option<(N, N)>
 where
     N: FromStr,
 {
-    match text.find(separator) {
-        None => Err(ParseError::create(&format!(
-            "Unable to find [separator={}] in [text={}]",
-            separator, text
-        ))),
-        Some(index) => match (N::from_str(&text[..index]), N::from_str(&text[index + 1..])) {
-            (Ok(l), Ok(r)) => Ok((l, r)),
-            _ => Err(ParseError::create(&format!(
-                "Failed to parse target type from [string={}]",
-                text
-            ))),
+    match split_pair(text, separator) {
+        None => None,
+        Some((left, right)) => match (N::from_str(left), N::from_str(right)) {
+            (Ok(l), Ok(r)) => Some((l, r)),
+            _ => None,
         },
     }
 }
@@ -28,6 +26,21 @@ mod tests {
 
     #[test]
     fn test_parse_pair() {
-        assert_eq!(parse_pair::<i32>("10,10", ','), Ok((10, 10)));
+        assert_eq!(parse_pair::<i32>("10,10", ','), Some((10, 10)));
+        assert_eq!(parse_pair::<i32>("10,", ','), None);
+        assert_eq!(parse_pair::<i32>(",10", ','), None);
+        assert_eq!(parse_pair::<i32>(",", ','), None);
+        assert_eq!(parse_pair::<i32>("", ','), None);
+        assert_eq!(parse_pair::<i32>("10,10,10", ','), None);
+    }
+
+    #[test]
+    fn test_split_pair() {
+        assert_eq!(split_pair("10,10", ','), Some(("10", "10")));
+        assert_eq!(split_pair("10,", ','), Some(("10", "")));
+        assert_eq!(split_pair(",10", ','), Some(("", "10")));
+        assert_eq!(split_pair(",", ','), Some(("", "")));
+        assert_eq!(split_pair("", ','), None);
+        assert_eq!(split_pair("10,10,10", ','), Some(("10", "10,10")));
     }
 }

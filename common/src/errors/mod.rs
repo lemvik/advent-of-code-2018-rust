@@ -26,6 +26,20 @@ impl std::convert::From<std::num::ParseIntError> for ParseError {
     }
 }
 
+impl std::convert::From<&str> for ParseError {
+    fn from(error: &str) -> Self {
+        ParseError {
+            message: error.to_owned(),
+        }
+    }
+}
+
+impl std::convert::From<String> for ParseError {
+    fn from(error: String) -> Self {
+        ParseError { message: error }
+    }
+}
+
 impl ParseError {
     pub fn create(message: &str) -> ParseError {
         ParseError {
